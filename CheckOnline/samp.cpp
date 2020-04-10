@@ -2,7 +2,7 @@
 
 stSAMP *g_SAMP = nullptr;
 stPlayerPool *g_Players = nullptr;
-extern uint32_t g_dwSAMP_Addr; // описание переменной
+extern uint32_t g_dwSAMP_Addr;
 
 void addToChatWindow(char *text, DWORD textColor)
 {

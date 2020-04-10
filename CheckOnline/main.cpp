@@ -1,13 +1,14 @@
 #include "main.h"
 
-uint32_t g_dwSAMP_Addr = NULL; // реализация переменной
+uint32_t g_dwSAMP_Addr = NULL;
 int serverId;
+
+// Constants
 const int serversCount = 6;
 const int typesCount = 3;
 const int maxGroupsCount = 5;
 
-std::string clists[serversCount][typesCount][maxGroupsCount];
-
+// Group names
 std::string names[serversCount][typesCount][maxGroupsCount] =
 {
 	// Advance RP
@@ -134,6 +135,10 @@ std::string names[serversCount][typesCount][maxGroupsCount] =
 	}
 };
 
+// Group clists
+std::string clists[serversCount][typesCount][maxGroupsCount];
+
+// Server functions
 int GetCurrentServer(char hostname[259])
 {
 	if (strstr(hostname, "Advance"))
@@ -151,7 +156,6 @@ int GetCurrentServer(char hostname[259])
 	else
 		return 6;
 }
-
 std::string GetServerNameById(int servId)
 {
 	switch (servId)
@@ -180,11 +184,9 @@ std::string GetServerNameById(int servId)
 	}
 }
 
+// Heximal, decimal functions
 uint32_t HeximalToDecimal(std::string h)
 {
-	// plan:
-	// without 0x
-
 	const int length = h.length();
 	uint32_t dec = 0;
 
@@ -218,7 +220,6 @@ uint32_t HeximalToDecimal(std::string h)
 
 	return dec;
 }
-
 std::string DecimalToHeximal(uint32_t dec)
 {
 	std::string digits[16] = { "0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F" };
@@ -231,6 +232,7 @@ std::string DecimalToHeximal(uint32_t dec)
 	return hex;
 }
 
+// Initialization
 bool SampInit()
 {
 	if (g_dwSAMP_Addr == NULL)    g_dwSAMP_Addr = (DWORD)GetModuleHandle("samp.dll");
@@ -241,7 +243,6 @@ bool SampInit()
 
 	return true;
 }
-
 void InitClists()
 {
 	for (int k = 0; k < 3; k++)
@@ -253,11 +254,7 @@ void InitClists()
 	}
 }
 
-inline bool IsFileExist(const std::string& name) {
-	struct stat buffer;
-	return (stat(name.c_str(), &buffer) == 0);
-}
-
+// Chat commands
 void cho()
 {
 
@@ -309,7 +306,6 @@ void cho()
 		text = "";
 	}
 }
-
 void cho_rep(char *param)
 {
 	if (g_SAMP == NULL)
@@ -346,6 +342,11 @@ void cho_rep(char *param)
 
 	snprintf(finalMessage, sizeof(finalMessage), finalMessageString.c_str(), org, hexEditedColor.c_str());
 	addToChatWindow(finalMessage, -1);
+}
+
+inline bool IsFileExist(const std::string& name) {
+	struct stat buffer;
+	return (stat(name.c_str(), &buffer) == 0);
 }
 
 int main()

@@ -1,7 +1,7 @@
 #pragma once
 
 // SAMP Structures
-#pragma pack(push, 1) // размер выравнивания = 1 байт
+#pragma pack(push, 1)
 struct stSAMPPools
 {
 	struct stActorPool		*pActor;
