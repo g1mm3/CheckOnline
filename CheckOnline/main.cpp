@@ -1,12 +1,16 @@
 #include "main.h"
 
+HMODULE hModule = NULL;
 uint32_t g_dwSAMP_Addr = NULL;
-int serverId;
+int serverId = 0;
 
 // Constants
 const int serversCount = 6;
 const int typesCount = 3;
 const int maxGroupsCount = 5;
+
+// Group clists
+std::string clists[serversCount][typesCount][maxGroupsCount];
 
 // Group names
 std::string names[serversCount][typesCount][maxGroupsCount] =
@@ -134,9 +138,6 @@ std::string names[serversCount][typesCount][maxGroupsCount] =
 		}
 	}
 };
-
-// Group clists
-std::string clists[serversCount][typesCount][maxGroupsCount];
 
 // Server functions
 int GetCurrentServer(char hostname[259])
@@ -351,30 +352,39 @@ inline bool IsFileExist(const std::string& name) {
 
 int main()
 {
+	if (GetModuleHandle("samp.dll"))
+	{
+		while (!SampInit())
+			Sleep(500);
 
-	while (!SampInit())
-		Sleep(500);
+		while (g_SAMP->iGameState != 14)
+			Sleep(100);
 
-	while (g_SAMP->iGameState != 14)
-		Sleep(100);
+		if (IsFileExist(".\\CheckOnline.ini"))
+			InitClists();
+		else
+		{
+			addToChatWindow("{D2691E}[CheckOnline] {FFFFFF}У вас отсутствует файл CheckOnline.ini", -1);
+			return 0;
+		}
 
-	if (IsFileExist(".\\CheckOnline.ini"))
-		InitClists();
+		serverId = GetCurrentServer(g_SAMP->szHostname);
+		addClientCommand("cho", cho);
+		addClientCommand("cho_rep", cho_rep);
+		
+	}
 	else
 	{
-		addToChatWindow("{D2691E}[CheckOnline] {FFFFFF}У вас отсутствует файл CheckOnline.ini", -1);
-		return 0;
+		FreeLibraryAndExitThread(hModule, 0);
 	}
-
-	serverId = GetCurrentServer(g_SAMP->szHostname);
-	addClientCommand("cho", cho);
-	addClientCommand("cho_rep", cho_rep);
 }
 
-BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpReserved)
+BOOL APIENTRY DllMain(HMODULE module, DWORD reason, LPVOID lpReserved)
 {
-	if (fdwReason == DLL_PROCESS_ATTACH)
+	if (reason == DLL_PROCESS_ATTACH)
 	{
+		DisableThreadLibraryCalls(module);
+		hModule = module;
 		_beginthread(_beginthread_proc_type(main), NULL, NULL);
 	}
 	return TRUE;
