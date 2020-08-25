@@ -157,31 +157,31 @@ int GetCurrentServer(char hostname[259])
 	else
 		return 6;
 }
+
 std::string GetServerNameById(int servId)
 {
 	switch (servId)
 	{
-		case 0 : 
+		case 0: 
 			return "Advance RP";
 			break;
-		case 1 :
+		case 1:
 			return "Samp-Rp";
 			break;
-		case 2 :
+		case 2:
 			return "Arizona RP";
 			break;
-		case 3 :
+		case 3:
 			return "Diamond RP";
 			break;
-		case 4 :
+		case 4:
 			return "Evolve-Rp";
 			break;
-		case 5 :
+		case 5:
 			 return "Pears Project";
 			 break;
-		default :
+		default:
 			return "";
-			break;
 	}
 }
 
@@ -221,9 +221,10 @@ uint32_t HeximalToDecimal(std::string h)
 
 	return dec;
 }
+
 std::string DecimalToHeximal(uint32_t dec)
 {
-	std::string digits[16] = { "0","1","2","3","4","5","6","7","8","9","A","B","C","D","E","F" };
+	std::string digits[16] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"};
 	std::string hex;
 	do
 	{
@@ -244,6 +245,7 @@ bool SampInit()
 
 	return true;
 }
+
 void InitClists()
 {
 	for (int k = 0; k < 3; k++)
@@ -264,24 +266,19 @@ void cho()
 
 	if (serverId == 6)
 	{
-		addToChatWindow("{D2691E}[CheckOnline] {FFFFFF}Данный сервер не поддерживается!", -1);
+		addToChatWindow("{D2691E}[CheckOnline] {FFFFFF}Р”Р°РЅРЅС‹Р№ СЃРµСЂРІРµСЂ РЅРµ РїРѕРґРґРµСЂР¶РёРІР°РµС‚СЃСЏ!", -1);
 		return;
 	}
 
-	std::string s;
-	std::string color;
-	std::string name;
-	std::string text;
-	std::string buf;
+	std::string color, name, text, buf;
 
 	int online = 0;
-	char* chr;
 
 	for (int k = 0; k < 3; k++)
 	{
 		for (int i = 0; i < 5; i++)
 		{
-			if (clists[serverId][k][i] == "")
+			if (clists[serverId][k][i].empty())
 				continue;
 
 			for (int j = 0; j < 1004; j++)
@@ -294,19 +291,18 @@ void cho()
 					}
 				}
 			}
-			s = clists[serverId][k][i];
-			color = s.erase(0, 2);
+			color = clists[serverId][k][i].erase(0, 2); // getting clist color w/o first two characters
 			name = names[serverId][k][i];
 			buf = name + ": {" + color + "}" + std::to_string(online) + "{FFFFFF} | ";
 			text += buf;
 			online = 0;
 		}
-		chr = const_cast<char*>(text.c_str());
-		addToChatWindow(chr, -1);
+		addToChatWindow(const_cast<char*>(text.c_str()), -1);
 
 		text = "";
 	}
 }
+
 void cho_rep(char *param)
 {
 	if (g_SAMP == NULL)
@@ -316,7 +312,7 @@ void cho_rep(char *param)
 	char org[50];
 
 	if (!strlen(param) || sscanf(param, "%d %s", &id, &org) < 2)
-		return addToChatWindow("{D2691E}[CheckOnline] {FFFFFF}Введите команду в формате: /cho_rep [ID] [организация]. Пример: /cho_rep 4 ацтеки", -1);
+		return addToChatWindow("{D2691E}[CheckOnline] {FFFFFF}Р’РІРµРґРёС‚Рµ РєРѕРјР°РЅРґСѓ РІ С„РѕСЂРјР°С‚Рµ: /cho_rep [ID] [РѕСЂРіР°РЅРёР·Р°С†РёСЏ]. РџСЂРёРјРµСЂ: /cho_rep 4 Р°С†С‚РµРєРё", -1);
 
 	uint32_t color;
 	char finalMessage[150];
@@ -326,10 +322,10 @@ void cho_rep(char *param)
 	else
 	{
 		if (id < 0 || id > 1000)
-			addToChatWindow("{D2691E}[CheckOnline] {FFFFFF}Введите ID от 0 до 1000!", -1);
+			addToChatWindow("{D2691E}[CheckOnline] {FFFFFF}Р’РІРµРґРёС‚Рµ ID РѕС‚ 0 РґРѕ 1000!", -1);
 		else
 		{
-			snprintf(finalMessage, sizeof(finalMessage), "{D2691E}[CheckOnline] {FFFFFF}Игрока с ID[%d] нет на сервере", id);
+			snprintf(finalMessage, sizeof(finalMessage), "{D2691E}[CheckOnline] {FFFFFF}РРіСЂРѕРєР° СЃ ID[%d] РЅРµС‚ РЅР° СЃРµСЂРІРµСЂРµ", id);
 			addToChatWindow(finalMessage, -1);
 		}
 		return;
@@ -339,12 +335,13 @@ void cho_rep(char *param)
 	InitClists();
 
 	std::string hexEditedColor = DecimalToHeximal(color).erase(0, 2);
-	std::string finalMessageString = "{D2691E}[CheckOnline] {FFFFFF}Успешно! Организация: %s | Цвет: {" + hexEditedColor + "}%s";
+	std::string finalMessageString = "{D2691E}[CheckOnline] {FFFFFF}РЈСЃРїРµС€РЅРѕ! РћСЂРіР°РЅРёР·Р°С†РёСЏ: %s | Р¦РІРµС‚: {" + hexEditedColor + "}%s";
 
 	snprintf(finalMessage, sizeof(finalMessage), finalMessageString.c_str(), org, hexEditedColor.c_str());
 	addToChatWindow(finalMessage, -1);
 }
 
+// 
 inline bool IsFileExist(const std::string& name) {
 	struct stat buffer;
 	return (stat(name.c_str(), &buffer) == 0);
@@ -364,7 +361,7 @@ int main()
 			InitClists();
 		else
 		{
-			addToChatWindow("{D2691E}[CheckOnline] {FFFFFF}У вас отсутствует файл CheckOnline.ini", -1);
+			addToChatWindow("{D2691E}[CheckOnline] {FFFFFF}РЈ РІР°СЃ РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚ С„Р°Р№Р» CheckOnline.ini", -1);
 			return 0;
 		}
 
