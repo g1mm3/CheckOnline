@@ -8,3 +8,10 @@
 #include <D3D9Types.h>
 #include "INI.h"
 #include "samp.h"
+
+
+// 
+inline bool IsFileExist(const std::string& name) {
+	struct stat buffer;
+	return (stat(name.c_str(), &buffer) == 0);
+}

@@ -139,6 +139,52 @@ std::string names[serversCount][typesCount][maxGroupsCount] =
 	}
 };
 
+
+// Heximal, decimal functions
+uint32_t HexToDec(std::string hex)
+{
+	const int length = hex.length();
+	uint32_t dec = 0;
+
+	int to;
+
+	for (int i = 0; i < length; i++)
+	{
+		switch (hex[i])
+		{
+		case '1': to = 1; break;
+		case '2': to = 2; break;
+		case '3': to = 3; break;
+		case '4': to = 4; break;
+		case '5': to = 5; break;
+		case '6': to = 6; break;
+		case '7': to = 7; break;
+		case '8': to = 8; break;
+		case '9': to = 9; break;
+		case 'A': to = 10; break;
+		case 'B': to = 11; break;
+		case 'C': to = 12; break;
+		case 'D': to = 13; break;
+		case 'E': to = 14; break;
+		case 'F': to = 15; break;
+
+		default: continue;
+		}
+
+		dec = dec + to * int(pow(16, length - (i + 1)));
+	}
+
+	return dec;
+}
+
+std::string DecToHex(uint32_t dec)
+{
+	char hex[20];
+	_itoa(dec, hex, 16);
+	return hex;
+}
+
+
 // Server functions
 int GetCurrentServer(char hostname[259])
 {
@@ -146,7 +192,7 @@ int GetCurrentServer(char hostname[259])
 		return 0;
 	else if (strstr(hostname, "Samp-Rp"))
 		return 1;
-	else if (strstr(hostname, "Arizona Role Play"))
+	else if (strstr(hostname, "Arizona Role Play") || strstr(hostname, "Arizona RP"))
 		return 2;
 	else if (strstr(hostname, "Diamond Role Play"))
 		return 3;
@@ -185,54 +231,6 @@ std::string GetServerNameById(int servId)
 	}
 }
 
-// Heximal, decimal functions
-uint32_t HeximalToDecimal(std::string h)
-{
-	const int length = h.length();
-	uint32_t dec = 0;
-
-	int to;
-
-	for (int i = 0; i < length; i++)
-	{
-		switch (h[i])
-		{
-		case '1': to = 1; break;
-		case '2': to = 2; break;
-		case '3': to = 3; break;
-		case '4': to = 4; break;
-		case '5': to = 5; break;
-		case '6': to = 6; break;
-		case '7': to = 7; break;
-		case '8': to = 8; break;
-		case '9': to = 9; break;
-		case 'A': to = 10; break;
-		case 'B': to = 11; break;
-		case 'C': to = 12; break;
-		case 'D': to = 13; break;
-		case 'E': to = 14; break;
-		case 'F': to = 15; break;
-
-		default: continue;
-		}
-
-		dec = dec + to * int(pow(16, length - (i + 1)));
-	}
-
-	return dec;
-}
-
-std::string DecimalToHeximal(uint32_t dec)
-{
-	std::string digits[16] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"};
-	std::string hex;
-	do
-	{
-		hex.insert(0, digits[dec % 16]);
-		dec /= 16;
-	} while (dec != 0);
-	return hex;
-}
 
 // Initialization
 bool SampInit()
@@ -242,6 +240,8 @@ bool SampInit()
 
 	if (g_SAMP == nullptr)        g_SAMP = *(stSAMP**)(g_dwSAMP_Addr + 0x21A0F8);
 	if (g_SAMP == nullptr)        return false;
+
+	if (g_SAMP->iGameState != 14) return false;
 
 	return true;
 }
@@ -257,6 +257,7 @@ void InitClists()
 	}
 }
 
+
 // Chat commands
 void cho()
 {
@@ -266,9 +267,11 @@ void cho()
 
 	if (serverId == 6)
 	{
-		addToChatWindow("{D2691E}[CheckOnline] {FFFFFF}Ð”Ð°Ð½Ð½Ñ‹Ð¹ ÑÐµÑ€Ð²ÐµÑ€ Ð½Ðµ Ð¿Ð¾Ð´Ð´ÐµÑ€Ð¶Ð¸Ð²Ð°ÐµÑ‚ÑÑ!", -1);
+		addToChatWindow("{D2691E}[CheckOnline] {FFFFFF}Äàííûé ñåðâåð íå ïîääåðæèâàåòñÿ!", -1);
 		return;
 	}
+
+	InitClists();
 
 	std::string color, name, text, buf;
 
@@ -285,7 +288,7 @@ void cho()
 			{
 				if (g_SAMP->pPools->pPlayer->iIsListed[j])
 				{
-					if (samp_color_get(j) == HeximalToDecimal(clists[serverId][k][i]))
+					if (samp_color_get(j) == HexToDec(clists[serverId][k][i]))
 					{
 						online++;
 					}
@@ -312,7 +315,7 @@ void cho_rep(char *param)
 	char org[50];
 
 	if (!strlen(param) || sscanf(param, "%d %s", &id, &org) < 2)
-		return addToChatWindow("{D2691E}[CheckOnline] {FFFFFF}Ð’Ð²ÐµÐ´Ð¸Ñ‚Ðµ ÐºÐ¾Ð¼Ð°Ð½Ð´Ñƒ Ð² Ñ„Ð¾Ñ€Ð¼Ð°Ñ‚Ðµ: /cho_rep [ID] [Ð¾Ñ€Ð³Ð°Ð½Ð¸Ð·Ð°Ñ†Ð¸Ñ]. ÐŸÑ€Ð¸Ð¼ÐµÑ€: /cho_rep 4 Ð°Ñ†Ñ‚ÐµÐºÐ¸", -1);
+		return addToChatWindow("{D2691E}[CheckOnline] {FFFFFF}Ââåäèòå êîìàíäó â ôîðìàòå: /cho_rep [ID] [îðãàíèçàöèÿ]. Ïðèìåð: /cho_rep 4 àöòåêè", -1);
 
 	uint32_t color;
 	char finalMessage[150];
@@ -322,58 +325,48 @@ void cho_rep(char *param)
 	else
 	{
 		if (id < 0 || id > 1000)
-			addToChatWindow("{D2691E}[CheckOnline] {FFFFFF}Ð’Ð²ÐµÐ´Ð¸Ñ‚Ðµ ID Ð¾Ñ‚ 0 Ð´Ð¾ 1000!", -1);
+			addToChatWindow("{D2691E}[CheckOnline] {FFFFFF}Ââåäèòå ID îò 0 äî 1000!", -1);
 		else
 		{
-			snprintf(finalMessage, sizeof(finalMessage), "{D2691E}[CheckOnline] {FFFFFF}Ð˜Ð³Ñ€Ð¾ÐºÐ° Ñ ID[%d] Ð½ÐµÑ‚ Ð½Ð° ÑÐµÑ€Ð²ÐµÑ€Ðµ", id);
+			snprintf(finalMessage, sizeof(finalMessage), "{D2691E}[CheckOnline] {FFFFFF}Èãðîêà ñ ID[%d] íåò íà ñåðâåðå", id);
 			addToChatWindow(finalMessage, -1);
 		}
 		return;
 	}
 
-	INI::WriteString(GetServerNameById(serverId).c_str(), org, DecimalToHeximal(color).c_str(), ".\\CheckOnline.ini");
+	INI::WriteString(GetServerNameById(serverId).c_str(), org, DecToHex(color).c_str(), ".\\CheckOnline.ini");
 	InitClists();
 
-	std::string hexEditedColor = DecimalToHeximal(color).erase(0, 2);
-	std::string finalMessageString = "{D2691E}[CheckOnline] {FFFFFF}Ð£ÑÐ¿ÐµÑˆÐ½Ð¾! ÐžÑ€Ð³Ð°Ð½Ð¸Ð·Ð°Ñ†Ð¸Ñ: %s | Ð¦Ð²ÐµÑ‚: {" + hexEditedColor + "}%s";
+	std::string hexEditedColor = DecToHex(color).erase(0, 2);
+	std::string finalMessageString = "{D2691E}[CheckOnline] {FFFFFF}Óñïåøíî! Îðãàíèçàöèÿ: %s | Öâåò: {" + hexEditedColor + "}%s";
 
 	snprintf(finalMessage, sizeof(finalMessage), finalMessageString.c_str(), org, hexEditedColor.c_str());
 	addToChatWindow(finalMessage, -1);
 }
 
-// 
-inline bool IsFileExist(const std::string& name) {
-	struct stat buffer;
-	return (stat(name.c_str(), &buffer) == 0);
-}
 
 int main()
 {
+	while (*(DWORD*)0xC8D4C0 != 9)
+		Sleep(350);
+
 	if (GetModuleHandle("samp.dll"))
 	{
 		while (!SampInit())
-			Sleep(500);
-
-		while (g_SAMP->iGameState != 14)
-			Sleep(100);
-
-		if (IsFileExist(".\\CheckOnline.ini"))
-			InitClists();
-		else
-		{
-			addToChatWindow("{D2691E}[CheckOnline] {FFFFFF}Ð£ Ð²Ð°Ñ Ð¾Ñ‚ÑÑƒÑ‚ÑÑ‚Ð²ÑƒÐµÑ‚ Ñ„Ð°Ð¹Ð» CheckOnline.ini", -1);
-			return 0;
-		}
-
-		serverId = GetCurrentServer(g_SAMP->szHostname);
-		addClientCommand("cho", cho);
-		addClientCommand("cho_rep", cho_rep);
-		
+			Sleep(350);
 	}
 	else
-	{
 		FreeLibraryAndExitThread(hModule, 0);
+
+	if (!IsFileExist(".\\CheckOnline.ini"))
+	{
+		addToChatWindow("{D2691E}[CheckOnline] {FFFFFF}Ó âàñ îòñóòñòâóåò ôàéë CheckOnline.ini", -1);
+		return 0;
 	}
+
+	serverId = GetCurrentServer(g_SAMP->szHostname);
+	addClientCommand("cho", cho);
+	addClientCommand("cho_rep", cho_rep);
 }
 
 BOOL APIENTRY DllMain(HMODULE module, DWORD reason, LPVOID lpReserved)
