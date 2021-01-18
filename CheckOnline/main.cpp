@@ -267,7 +267,7 @@ void cho()
 
 	if (serverId == 6)
 	{
-		addToChatWindow("{D2691E}[CheckOnline] {FFFFFF}Данный сервер не поддерживается!", -1);
+		addToChatWindow("{D2691E}[CheckOnline] {FFFFFF}Р”Р°РЅРЅС‹Р№ СЃРµСЂРІРµСЂ РЅРµ РїРѕРґРґРµСЂР¶РёРІР°РµС‚СЃСЏ!", -1);
 		return;
 	}
 
@@ -315,7 +315,7 @@ void cho_rep(char *param)
 	char org[50];
 
 	if (!strlen(param) || sscanf(param, "%d %s", &id, &org) < 2)
-		return addToChatWindow("{D2691E}[CheckOnline] {FFFFFF}Введите команду в формате: /cho_rep [ID] [организация]. Пример: /cho_rep 4 ацтеки", -1);
+		return addToChatWindow("{D2691E}[CheckOnline] {FFFFFF}Р’РІРµРґРёС‚Рµ РєРѕРјР°РЅРґСѓ РІ С„РѕСЂРјР°С‚Рµ: /cho_rep [ID] [РѕСЂРіР°РЅРёР·Р°С†РёСЏ]. РџСЂРёРјРµСЂ: /cho_rep 4 Р°С†С‚РµРєРё", -1);
 
 	uint32_t color;
 	char finalMessage[150];
@@ -325,10 +325,10 @@ void cho_rep(char *param)
 	else
 	{
 		if (id < 0 || id > 1000)
-			addToChatWindow("{D2691E}[CheckOnline] {FFFFFF}Введите ID от 0 до 1000!", -1);
+			addToChatWindow("{D2691E}[CheckOnline] {FFFFFF}Р’РІРµРґРёС‚Рµ ID РѕС‚ 0 РґРѕ 1000!", -1);
 		else
 		{
-			snprintf(finalMessage, sizeof(finalMessage), "{D2691E}[CheckOnline] {FFFFFF}Игрока с ID[%d] нет на сервере", id);
+			snprintf(finalMessage, sizeof(finalMessage), "{D2691E}[CheckOnline] {FFFFFF}РРіСЂРѕРєР° СЃ ID[%d] РЅРµС‚ РЅР° СЃРµСЂРІРµСЂРµ", id);
 			addToChatWindow(finalMessage, -1);
 		}
 		return;
@@ -338,7 +338,7 @@ void cho_rep(char *param)
 	InitClists();
 
 	std::string hexEditedColor = DecToHex(color).erase(0, 2);
-	std::string finalMessageString = "{D2691E}[CheckOnline] {FFFFFF}Успешно! Организация: %s | Цвет: {" + hexEditedColor + "}%s";
+	std::string finalMessageString = "{D2691E}[CheckOnline] {FFFFFF}РЈСЃРїРµС€РЅРѕ! РћСЂРіР°РЅРёР·Р°С†РёСЏ: %s | Р¦РІРµС‚: {" + hexEditedColor + "}%s";
 
 	snprintf(finalMessage, sizeof(finalMessage), finalMessageString.c_str(), org, hexEditedColor.c_str());
 	addToChatWindow(finalMessage, -1);
@@ -360,7 +360,7 @@ int main()
 
 	if (!IsFileExist(".\\CheckOnline.ini"))
 	{
-		addToChatWindow("{D2691E}[CheckOnline] {FFFFFF}У вас отсутствует файл CheckOnline.ini", -1);
+		addToChatWindow("{D2691E}[CheckOnline] {FFFFFF}РЈ РІР°СЃ РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚ С„Р°Р№Р» CheckOnline.ini", -1);
 		return 0;
 	}
 
