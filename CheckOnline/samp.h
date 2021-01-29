@@ -1,6 +1,9 @@
 #pragma once
+#include <string>
+#include <cstdint>
+#include <Windows.h>
+#include <D3D9Types.h>
 
-// SAMP Structures
 #pragma pack(push, 1)
 struct stSAMPPools
 {
@@ -14,7 +17,6 @@ struct stSAMPPools
 	struct stVehiclePool	*pVehicle;
 	struct stPickupPool		*pPickup;
 };
-
 struct stSAMP
 {
 	void					*pUnk0;
@@ -32,7 +34,6 @@ struct stSAMP
 	void					*pRakClientInterface;
 	struct stSAMPPools		*pPools;
 };
-
 struct stPlayerPool
 {
 	uint32_t				ulMaxPlayerID;
@@ -44,17 +45,27 @@ struct stPlayerPool
 	int						iLocalPlayerScore;
 	struct stRemotePlayer	*pRemotePlayer[1004];
 	int						iIsListed[1004];
-	DWORD						dwPlayerIP[1004]; // always 0
+	DWORD					dwPlayerIP[1004]; // always 0
 };
 #pragma pack(pop)
 
+class Samp
+{
+private:
+	uint32_t g_dwSAMP_Addr;
+	struct stSAMP* g_SAMP;
+public:
 
-// Functions
-D3DCOLOR samp_color_get(int id, DWORD trans = 0xFF000000);
+	Samp::Samp();
+	bool Init();
 
-extern void addToChatWindow(char *text, DWORD textColor);
-extern void addClientCommand(const char *command, void *function);
+	stPlayerPool* GetPlayers();
+	char* GetServerHostname();
 
-// global pointer externals
-extern struct stSAMP *g_SAMP;
-extern struct stPlayerPool *g_Players;
+	void AddToChatWindow(char* text, DWORD textColor);
+	void AddClientCommand(const char* command, void* function);
+
+	D3DCOLOR GetSampColor(int id, DWORD trans = 0xFF000000);
+};
+
+extern Samp* pSamp;

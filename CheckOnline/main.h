@@ -1,17 +1,14 @@
 #pragma once
-#include <iostream>
-#include <string>
+#include <Windows.h>
 #include <process.h>
 #include <fstream>
-#include <windows.h>
+#include <io.h> // для _access (344 строка main.cpp)
 
-#include <D3D9Types.h>
-#include "INI.h"
-#include "samp.h"
+#include "JSON/json.hpp"
+#include "Server.h"
+#include "Samp.h"
+#include "Utils.h"
 
+using json = nlohmann::json;
 
-// 
-inline bool IsFileExist(const std::string& name) {
-	struct stat buffer;
-	return (stat(name.c_str(), &buffer) == 0);
-}
+json mainJson;

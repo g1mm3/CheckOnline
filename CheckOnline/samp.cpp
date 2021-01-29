@@ -1,10 +1,38 @@
-#include "main.h"
+#include "samp.h"
+#include "Utils.h"
 
-stSAMP *g_SAMP = nullptr;
-stPlayerPool *g_Players = nullptr;
-extern uint32_t g_dwSAMP_Addr;
+Samp *pSamp;
 
-void addToChatWindow(char *text, DWORD textColor)
+Samp::Samp()
+{
+	g_dwSAMP_Addr = NULL;
+	stSAMP *g_SAMP = nullptr;
+}
+
+bool Samp::Init()
+{
+	if (g_dwSAMP_Addr == NULL) g_dwSAMP_Addr = (DWORD)GetModuleHandleA("samp.dll");
+	if (g_dwSAMP_Addr == NULL) return false;
+
+	if (g_SAMP == nullptr) g_SAMP = *(stSAMP**)(g_dwSAMP_Addr + 0x21A0F8);
+	if (g_SAMP == nullptr) return false;
+
+	if (g_SAMP->iGameState != 14) return false;
+
+	return true;
+}
+
+stPlayerPool* Samp::GetPlayers()
+{
+	return g_SAMP->pPools->pPlayer;
+}
+
+char* Samp::GetServerHostname()
+{
+	return g_SAMP->szHostname;
+}
+
+void Samp::AddToChatWindow(char *text, DWORD textColor)
 {
 	if (!g_dwSAMP_Addr)
 		return;
@@ -24,15 +52,29 @@ void addToChatWindow(char *text, DWORD textColor)
 	__asm call func
 }
 
-void addClientCommand(const char *command, void *function)
+void Samp::AddClientCommand(const char *command, void *function)
 {
 	((void(__thiscall *)(DWORD str, const char* cmd, void* func))(g_dwSAMP_Addr + 0x65AD0))(*(DWORD*)(g_dwSAMP_Addr + 0x21A0E8), command, function);
 }
 
-D3DCOLOR samp_color_get(int id, DWORD trans)
+D3DCOLOR Samp::GetSampColor(int id, DWORD trans)
 {
 	if (g_dwSAMP_Addr == NULL)
 		return NULL;
+
+	if (!(this->GetPlayers()->iIsListed[id]) && id != this->GetPlayers()->sLocalPlayerID)
+	{
+		if (id < 0 || id > 1000)
+			this->AddToChatWindow(PrepareTextToOutput("{D2691E}[CheckOnline] {FFFFFF}¬ведите id от 0 до 1000!"), -1);
+		else
+		{
+			char bufferString[150];
+			snprintf(bufferString, sizeof(bufferString), "{D2691E}[CheckOnline] {FFFFFF}»грока с id[%d] нет на сервере", id);
+			this->AddToChatWindow(PrepareTextToOutput(bufferString), -1);
+		}
+		
+		return 0;
+	}
 
 	D3DCOLOR	*color_table;
 	if (id < 0 || id >= (1004 + 3))

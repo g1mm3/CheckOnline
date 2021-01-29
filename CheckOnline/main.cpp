@@ -1,378 +1,251 @@
 #include "main.h"
+// #include <iostream> // 
 
 HMODULE hModule = NULL;
-uint32_t g_dwSAMP_Addr = NULL;
-int serverId = 0;
 
-// Constants
-const int serversCount = 6;
-const int typesCount = 3;
-const int maxGroupsCount = 5;
-
-// Group clists
-std::string clists[serversCount][typesCount][maxGroupsCount];
-
-// Group names
-std::string names[serversCount][typesCount][maxGroupsCount] =
-{
-	// Advance RP
-	{
-		{
-			"Grove",
-			"Ballas",
-			"Vagos",
-			"Rifa",
-			"Aztec"
-		},
-		{
-			"LCN",
-			"Yakuza",
-			"Russian"
-		},
-		{
-			"Masked",
-			"Bomj"
-		}
-	},
-
-	// Samp RP
-	{
-		{
-			"Grove",
-			"Ballas",
-			"Vagos",
-			"Rifa",
-			"Aztec"
-		},
-		{
-			"LCN",
-			"Yakuza",
-			"Russian"
-		},
-		{
-			"Masked",
-			"Bomj"
-		}
-	},
-
-	// Arizona RP
-	{
-		{
-			"Grove",
-			"Ballas",
-			"Vagos",
-			"Rifa",
-			"Aztec"
-		},
-		{
-			"LCN",
-			"Yakuza",
-			"Russian",
-			"Warlock"
-		},
-		{
-			"Wolfs",
-			"Masked",
-			"Bomj"
-		}
-	},
-
-	// Diamond RP
-	{
-		{
-			"Grove",
-			"Ballas",
-			"Vagos",
-			"Rifa",
-			"Aztec"
-		},
-		{
-			"Mexican",
-			"Yakuza",
-			"Columbian"
-		},
-		{
-			"Masked",
-			"Bomj"
-		}
-	},
-
-	// Evolve RP
-	{
-		{
-			"Grove",
-			"Ballas",
-			"Vagos",
-			"Rifa",
-			"Aztec"
-		},
-		{
-			"LCN",
-			"Yakuza",
-			"Russian"
-		},
-		{
-			"Masked",
-			"Bomj"
-		}
-	},
-
-	// Pears Project
-	{
-		{
-			"Grove",
-			"Ballas",
-			"Vagos",
-			"Aztec"
-		},
-		{
-			"LCN",
-			"Yakuza",
-			"Russian",
-			"Arabian"
-		},
-		{
-			"Triada",
-			"Hitmans",
-			"Bomj"
-		}
-	}
-};
-
-
-// Heximal, decimal functions
-uint32_t HexToDec(std::string hex)
-{
-	const int length = hex.length();
-	uint32_t dec = 0;
-
-	int to;
-
-	for (int i = 0; i < length; i++)
-	{
-		switch (hex[i])
-		{
-		case '1': to = 1; break;
-		case '2': to = 2; break;
-		case '3': to = 3; break;
-		case '4': to = 4; break;
-		case '5': to = 5; break;
-		case '6': to = 6; break;
-		case '7': to = 7; break;
-		case '8': to = 8; break;
-		case '9': to = 9; break;
-		case 'A': to = 10; break;
-		case 'B': to = 11; break;
-		case 'C': to = 12; break;
-		case 'D': to = 13; break;
-		case 'E': to = 14; break;
-		case 'F': to = 15; break;
-
-		default: continue;
-		}
-
-		dec = dec + to * int(pow(16, length - (i + 1)));
-	}
-
-	return dec;
-}
-
-std::string DecToHex(uint32_t dec)
-{
-	char hex[20];
-	_itoa(dec, hex, 16);
-	return hex;
-}
-
-
-// Server functions
-int GetCurrentServer(char hostname[259])
-{
-	if (strstr(hostname, "Advance"))
-		return 0;
-	else if (strstr(hostname, "Samp-Rp"))
-		return 1;
-	else if (strstr(hostname, "Arizona Role Play") || strstr(hostname, "Arizona RP"))
-		return 2;
-	else if (strstr(hostname, "Diamond Role Play"))
-		return 3;
-	else if (strstr(hostname, "Evolve-Rp"))
-		return 4;
-	else if (strstr(hostname, "Pears"))
-		return 5;
-	else
-		return 6;
-}
-
-std::string GetServerNameById(int servId)
-{
-	switch (servId)
-	{
-		case 0: 
-			return "Advance RP";
-			break;
-		case 1:
-			return "Samp-Rp";
-			break;
-		case 2:
-			return "Arizona RP";
-			break;
-		case 3:
-			return "Diamond RP";
-			break;
-		case 4:
-			return "Evolve-Rp";
-			break;
-		case 5:
-			 return "Pears Project";
-			 break;
-		default:
-			return "";
-	}
-}
-
-
-// Initialization
-bool SampInit()
-{
-	if (g_dwSAMP_Addr == NULL)    g_dwSAMP_Addr = (DWORD)GetModuleHandle("samp.dll");
-	if (g_dwSAMP_Addr == NULL)    return false;
-
-	if (g_SAMP == nullptr)        g_SAMP = *(stSAMP**)(g_dwSAMP_Addr + 0x21A0F8);
-	if (g_SAMP == nullptr)        return false;
-
-	if (g_SAMP->iGameState != 14) return false;
-
-	return true;
-}
-
-void InitClists()
-{
-	for (int k = 0; k < 3; k++)
-	{
-		for (int i = 0; i < 5; i++)
-		{
-			clists[serverId][k][i] = INI::ReadString(GetServerNameById(serverId).c_str(), names[serverId][k][i].c_str(), 9, ".\\CheckOnline.ini");
-		}
-	}
-}
-
-
-// Chat commands
+// Команды чата
 void cho()
 {
-
-	if (!g_SAMP->pPools->pPlayer)
+	if (!pSamp->GetPlayers())
 		return;
 
-	if (serverId == 6)
-	{
-		addToChatWindow("{D2691E}[CheckOnline] {FFFFFF}Данный сервер не поддерживается!", -1);
-		return;
-	}
+	pServer->InitClists();
 
-	InitClists();
-
-	std::string color, name, text, buf;
+	std::string color, name, buf;
+	std::string text = "";
 
 	int online = 0;
 
-	for (int k = 0; k < 3; k++)
+	for (int i = 0; i < pServer->groupClists.size(); i++)
 	{
-		for (int i = 0; i < 5; i++)
+		for (int j = 0; j < pServer->groupClists[i].size(); j++)
 		{
-			if (clists[serverId][k][i].empty())
+			if (pServer->groupClists[i][j][1].empty())
 				continue;
 
-			for (int j = 0; j < 1004; j++)
+			for (int k = 0; k < 1004; k++)
 			{
-				if (g_SAMP->pPools->pPlayer->iIsListed[j])
+				if (pSamp->GetPlayers()->iIsListed[k])
 				{
-					if (samp_color_get(j) == HexToDec(clists[serverId][k][i]))
+					if (pSamp->GetSampColor(k) == HeximalToDecimal(pServer->groupClists[i][j][1]))
 					{
 						online++;
 					}
 				}
 			}
-			color = clists[serverId][k][i].erase(0, 2); // getting clist color w/o first two characters
-			name = names[serverId][k][i];
+			color = pServer->groupClists[i][j][1].erase(0, 2); // getting clist color w/o first two characters
+			name = pServer->groupClists[i][j][0];
 			buf = name + ": {" + color + "}" + std::to_string(online) + "{FFFFFF} | ";
 			text += buf;
 			online = 0;
 		}
-		addToChatWindow(const_cast<char*>(text.c_str()), -1);
+		pSamp->AddToChatWindow(PrepareTextToOutput(text), -1);
 
 		text = "";
 	}
 }
 
-void cho_rep(char *param)
+void cho_cl(char *param)
 {
-	if (g_SAMP == NULL)
+	if (!pSamp->GetPlayers())
+		return;
+
+	pServer->InitClists();
+
+	int id;
+	char organization[30];
+
+	if (!strlen(param) || sscanf(param, "%d %s", &id, &organization) < 2)
+	{
+		pSamp->AddToChatWindow(PrepareTextToOutput("{D2691E}[CheckOnline] {FFFFFF}Введите команду в формате: /cho_cl [id] [организация]. Пример: /cho_rep 4 Aztec"), -1);
+		return;
+	}
+
+	uint32_t color = pSamp->GetSampColor(id);
+	if (color == 0)
+		return;
+
+	char bufferString[150];
+	// провека на то, что указанная организация обозначена для текущего сервера
+	for (int i = 0; i < pServer->groupClists.size(); i++)
+	{
+		for (int j = 0; j < pServer->groupClists[i].size(); j++)
+		{
+			if (pServer->groupClists[i][j][0] == organization)
+			{
+				mainJson[pServer->name][i][j][1] = StringToUpperCase(DecimalToHeximal(color));
+				
+				pServer->InitClists(mainJson);
+
+				snprintf(bufferString, sizeof(bufferString), "{D2691E}[CheckOnline] {FFFFFF}Успешно! Организация: %s | Цвет: {%s}%s",
+					organization,
+					StringToUpperCase(DecimalToHeximal(color).erase(0, 2)).c_str(),
+					StringToUpperCase(DecimalToHeximal(color).erase(0, 2)).c_str()
+				);
+
+				pSamp->AddToChatWindow(PrepareTextToOutput(bufferString), -1);
+				return;
+			}
+		}
+	}
+	
+	// если указанной организации нет в списках -> вывод тех, которые есть
+	std::string clr, name, buf;
+	std::string text = "";
+	pSamp->AddToChatWindow(PrepareTextToOutput("{D2691E}[CheckOnline] {FFFFFF}Введите корректную организацию! Вот список допустимых названий организаций: "), -1);
+	for (int i = 0; i < pServer->groupClists.size(); i++)
+	{
+		for (int j = 0; j < pServer->groupClists[i].size(); j++)
+		{
+			clr = pServer->groupClists[i][j][1].erase(0, 2); // getting clist color w/o first two characters
+			name = pServer->groupClists[i][j][0];
+			buf = "{" + clr + "}" + name + " | " ;
+			text += buf;
+		}
+		pSamp->AddToChatWindow(PrepareTextToOutput(text), -1);
+		text = "";
+	}
+}
+
+void cho_add(char* param)
+{
+	if (!pSamp->GetPlayers())
 		return;
 
 	int id;
-	char org[50];
+	char tagName[30];
 
-	if (!strlen(param) || sscanf(param, "%d %s", &id, &org) < 2)
-		return addToChatWindow("{D2691E}[CheckOnline] {FFFFFF}Введите команду в формате: /cho_rep [ID] [организация]. Пример: /cho_rep 4 ацтеки", -1);
-
-	uint32_t color;
-	char finalMessage[150];
-
-	if (g_SAMP->pPools->pPlayer->iIsListed[id])
-		color = samp_color_get(id);
-	else
+	if (!strlen(param) || sscanf(param, "%d %s", &id, &tagName) < 2)
 	{
-		if (id < 0 || id > 1000)
-			addToChatWindow("{D2691E}[CheckOnline] {FFFFFF}Введите ID от 0 до 1000!", -1);
-		else
-		{
-			snprintf(finalMessage, sizeof(finalMessage), "{D2691E}[CheckOnline] {FFFFFF}Игрока с ID[%d] нет на сервере", id);
-			addToChatWindow(finalMessage, -1);
-		}
+		pSamp->AddToChatWindow(PrepareTextToOutput("{D2691E}[CheckOnline] {FFFFFF}Введите команду в формате: /cho_add [id] [tag]. Например: /cho_add 220 таксисты"), -1);
 		return;
 	}
 
-	INI::WriteString(GetServerNameById(serverId).c_str(), org, DecToHex(color).c_str(), ".\\CheckOnline.ini");
-	InitClists();
+	uint32_t color = pSamp->GetSampColor(id);
+	if (color == 0)
+		return;
 
-	std::string hexEditedColor = DecToHex(color).erase(0, 2);
-	std::string finalMessageString = "{D2691E}[CheckOnline] {FFFFFF}Успешно! Организация: %s | Цвет: {" + hexEditedColor + "}%s";
+	if (mainJson.find("Z_Polygon") == mainJson.end())
+	{
+		pSamp->AddToChatWindow(PrepareTextToOutput("{D2691E}[CheckOnline] {FFFFFF}В файле CheckOnline.json нет секции Polygon"), -1);
+		return;
+	}
 
-	snprintf(finalMessage, sizeof(finalMessage), finalMessageString.c_str(), org, hexEditedColor.c_str());
-	addToChatWindow(finalMessage, -1);
+	int polygonSize = mainJson["Z_Polygon"].size();
+
+
+	mainJson["Z_Polygon"][polygonSize][0] = CP1251_to_UTF8(tagName);
+	mainJson["Z_Polygon"][polygonSize][1] = StringToUpperCase(DecimalToHeximal(color));
+
+	pServer->InitClists(mainJson);
+
+	char bufferString[150];
+	snprintf(bufferString, sizeof(bufferString), "{D2691E}[CheckOnline] {FFFFFF}Успешно! Тег: %s | Цвет: {%s}%s",
+		CP1251_to_UTF8(tagName).c_str(),
+		StringToUpperCase(DecimalToHeximal(color).erase(0, 2)).c_str(),
+		StringToUpperCase(DecimalToHeximal(color).erase(0, 2)).c_str()
+	);
+
+	pSamp->AddToChatWindow(PrepareTextToOutput(bufferString), -1);
 }
 
+void cho_rt()
+{
+	if (pServer)
+		delete pServer;
 
+	// Проверка на существование файла (если не существует -> создать)
+	if (_access(".\\CheckOnline.json", 0))
+	{
+		std::ofstream file(".\\CheckOnline.json");
+		file << mainJson;
+	}
+
+	// Читка JSON-файла
+	std::ifstream ifs("CheckOnline.json");
+	mainJson = json::parse(ifs);
+
+	pServer = new Server(pSamp->GetServerHostname(), mainJson);
+	pSamp->AddToChatWindow(PrepareTextToOutput("{D2691E}[CheckOnline] {FFFFFF}Перезагрузка выполнена успешно!"), -1);
+}
+
+// MAIN
 int main()
 {
+	// Проверка: загружена ли игра
 	while (*(DWORD*)0xC8D4C0 != 9)
 		Sleep(350);
 
-	if (GetModuleHandle("samp.dll"))
+	
+	// Инициализация сампа
+	if (GetModuleHandleA("samp.dll"))
 	{
-		while (!SampInit())
+		pSamp = new Samp();
+
+		while (!pSamp->Init())
 			Sleep(350);
 	}
 	else
-		FreeLibraryAndExitThread(hModule, 0);
-
-	if (!IsFileExist(".\\CheckOnline.ini"))
 	{
-		addToChatWindow("{D2691E}[CheckOnline] {FFFFFF}У вас отсутствует файл CheckOnline.ini", -1);
+		if (pSamp)
+			delete pSamp;
+
+		FreeLibraryAndExitThread(hModule, 0);
+	}
+
+	// Проверка на существование файла (если не существует -> создать)
+	if (_access("CheckOnline.json", 0))
+	{
+		std::ofstream file("CheckOnline.json");
+		file << mainJson;
+	}
+
+	// Читка JSON-файла
+	std::ifstream ifs("CheckOnline.json");
+	// это, чтобы плагин не крашнулся, если при читке произойдет какая-то ошибка
+	try
+	{
+		mainJson = json::parse(ifs);
+	}
+	catch(std::exception e)
+	{
+		pSamp->AddToChatWindow(PrepareTextToOutput("{D2691E}[CheckOnline] {FFFFFF}При инициализации JSON-файла произошла ошибка!"), -1);
+		pSamp->AddToChatWindow(PrepareTextToOutput("{D2691E}[CheckOnline] {FFFFFF}Возможно, вы не убрали запятые после последних элементов!"), -1);
+	}
+
+	if (mainJson.dump() == "null" || mainJson.dump() == "")
+	{
+		pSamp->AddToChatWindow(PrepareTextToOutput("{D2691E}[CheckOnline] {FFFFFF}Ваш JSON-файл пуст!"), -1);
 		return 0;
 	}
 
-	serverId = GetCurrentServer(g_SAMP->szHostname);
-	addClientCommand("cho", cho);
-	addClientCommand("cho_rep", cho_rep);
+	pServer = new Server(pSamp->GetServerHostname(), mainJson);
+
+	if (pServer->name == "")
+	{
+		pSamp->AddToChatWindow(PrepareTextToOutput("{D2691E}[CheckOnline] {FFFFFF}Данный сервер не поддерживается!"), -1);
+		delete pServer;
+		return 0;
+	}
+
+	pServer->InitClists();
+
+	// Регистрация команд
+	pSamp->AddClientCommand("cho", cho);
+	pSamp->AddClientCommand("cho_cl", cho_cl);
+	pSamp->AddClientCommand("cho_add", cho_add);
+	pSamp->AddClientCommand("cho_rt", cho_rt);
 }
 
 BOOL APIENTRY DllMain(HMODULE module, DWORD reason, LPVOID lpReserved)
 {
 	if (reason == DLL_PROCESS_ATTACH)
 	{
+		// Консоль для дебага
+		// AllocConsole();
+		//freopen("CONIN$", "r", stdin);
+		//freopen("CONOUT$", "w", stdout);
+
 		DisableThreadLibraryCalls(module);
 		hModule = module;
 		_beginthread(_beginthread_proc_type(main), NULL, NULL);
