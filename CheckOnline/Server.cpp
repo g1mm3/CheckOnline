@@ -39,7 +39,7 @@ void Server::InitClists()
 void Server::InitClists(const nlohmann::json& j)
 {
 	std::ofstream file("CheckOnline.json");
-	file << std::setw(4) << j << std::endl;
+	file << std::setw(2) << j << std::endl;
 
 	std::vector<std::vector<std::vector<std::string>>> tempArray = j[this->name];
 	this->groupClists = tempArray;

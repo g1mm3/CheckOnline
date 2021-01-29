@@ -50,8 +50,6 @@ void cho_cl(char *param)
 	if (!pSamp->GetPlayers())
 		return;
 
-	pServer->InitClists();
-
 	int id;
 	char organization[30];
 
@@ -88,6 +86,8 @@ void cho_cl(char *param)
 			}
 		}
 	}
+
+	pServer->InitClists();
 	
 	// если указанной организации нет в списках -> вывод тех, которые есть
 	std::string clr, name, buf;
@@ -211,6 +211,7 @@ int main()
 	{
 		pSamp->AddToChatWindow(PrepareTextToOutput("{D2691E}[CheckOnline] {FFFFFF}При инициализации JSON-файла произошла ошибка!"), -1);
 		pSamp->AddToChatWindow(PrepareTextToOutput("{D2691E}[CheckOnline] {FFFFFF}Возможно, вы не убрали запятые после последних элементов!"), -1);
+		return 0;
 	}
 
 	if (mainJson.dump() == "null" || mainJson.dump() == "")
