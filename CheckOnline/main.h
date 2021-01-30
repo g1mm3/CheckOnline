@@ -2,7 +2,7 @@
 #include <Windows.h>
 #include <process.h>
 #include <fstream>
-#include <io.h> // для _access (344 строка main.cpp)
+#include <io.h> // РґР»СЏ _access (344 СЃС‚СЂРѕРєР° main.cpp)
 
 #include "JSON/json.hpp"
 #include "Server.h"

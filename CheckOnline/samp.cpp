@@ -65,11 +65,11 @@ D3DCOLOR Samp::GetSampColor(int id, DWORD trans)
 	if (!(this->GetPlayers()->iIsListed[id]) && id != this->GetPlayers()->sLocalPlayerID)
 	{
 		if (id < 0 || id > 1000)
-			this->AddToChatWindow(PrepareTextToOutput("{D2691E}[CheckOnline] {FFFFFF}Ââåäèòå id îò 0 äî 1000!"), -1);
+			this->AddToChatWindow(PrepareTextToOutput("{D2691E}[CheckOnline] {FFFFFF}Ð’Ð²ÐµÐ´Ð¸Ñ‚Ðµ id Ð¾Ñ‚ 0 Ð´Ð¾ 1000!"), -1);
 		else
 		{
 			char bufferString[150];
-			snprintf(bufferString, sizeof(bufferString), "{D2691E}[CheckOnline] {FFFFFF}Èãðîêà ñ id[%d] íåò íà ñåðâåðå", id);
+			snprintf(bufferString, sizeof(bufferString), "{D2691E}[CheckOnline] {FFFFFF}Ð˜Ð³Ñ€Ð¾ÐºÐ° Ñ id[%d] Ð½ÐµÑ‚ Ð½Ð° ÑÐµÑ€Ð²ÐµÑ€Ðµ", id);
 			this->AddToChatWindow(PrepareTextToOutput(bufferString), -1);
 		}
 		

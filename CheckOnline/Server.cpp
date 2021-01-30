@@ -35,7 +35,7 @@ void Server::InitClists()
 	this->groupClists = tempArray;
 }
 
-// Это для записи/перезаписи
+// Р­С‚Рѕ РґР»СЏ Р·Р°РїРёСЃРё/РїРµСЂРµР·Р°РїРёСЃРё
 void Server::InitClists(const nlohmann::json& j)
 {
 	std::ofstream file("CheckOnline.json");
